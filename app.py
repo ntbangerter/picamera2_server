@@ -1,6 +1,5 @@
 from flask import Flask, send_file
 from io import BytesIO
-from PIL import Image
 from picamera2 import Picamera2
 import numpy as np
 
