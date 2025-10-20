@@ -36,7 +36,7 @@ class PicameraWrapper:
         buf = BytesIO()
         # self.picam.capture_file(buf, format="jpeg")
         with self.picam.captured_request() as request:
-            request.save(buf, format="jpeg")
+            request.save("main", buf, format="jpeg")
         buf.seek(0)
         return buf
 
