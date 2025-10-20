@@ -44,7 +44,7 @@ class PicameraWrapper:
         buf = BytesIO()
         # img_array = self.picam.capture_array()
         with self.picam.captured_request() as request:
-            img_array = request.make_array()
+            img_array = request.make_array("main")
             np.save(buf, img_array)
         buf.seek(0)
         return buf
