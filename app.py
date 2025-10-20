@@ -1,12 +1,9 @@
 from flask import Flask, send_file
-from io import BytesIO
-from picamera2 import Picamera2
-import numpy as np
+
+from .picamera_wrapper import PicameraWrapper
 
 
-picam = Picamera2()
-picam.start()
-
+picam = PicameraWrapper()
 app = Flask(__name__)
 
 
@@ -17,21 +14,18 @@ def health():
 
 @app.route("/capture_jpeg")
 def capture_jpeg():
-    buf = BytesIO()
-    picam.capture_file(buf, format="jpeg")
-    buf.seek(0)
-    
-    return send_file(buf, mimetype='image/jpeg')
+    return send_file(
+        picam.capture_jpeg(),
+        mimetype='image/jpeg'
+    )
 
 
 @app.route("/capture_array")
 def capture_array():
-    img_array = picam.capture_array()
-    buf = BytesIO()
-    np.save(buf, img_array)
-    buf.seek(0)
-
-    return send_file(buf, mimetype='application/octet-stream')
+    return send_file(
+        picam.capture_array(),
+        mimetype='application/octet-stream',
+    )
 
 
 @app.route("/")
