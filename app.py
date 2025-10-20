@@ -1,6 +1,6 @@
 from flask import Flask, send_file
 
-from .picamera_wrapper import PicameraWrapper
+from picamera_wrapper import PicameraWrapper
 
 
 picam = PicameraWrapper()
