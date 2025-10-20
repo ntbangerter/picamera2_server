@@ -1,7 +1,9 @@
 from io import BytesIO
+import numpy as np
 from picamera2 import Picamera2
 from picamera2.encoders import H264Encoder
-import numpy as np
+from picamera2.outputs import FileOutput
+import socket
 
 
 class PicameraWrapper:
@@ -17,8 +19,8 @@ class PicameraWrapper:
         self.picam = Picamera2()
         
         full_res = self.picam.sensor_resolution
-        half_res = [dim // 2 for dim in full_resolution]
-        main_stream = {"size": full_resolution, "format": "RGB888"}
+        # half_res = [dim // 2 for dim in full_res]
+        main_stream = {"size": full_res, "format": "RGB888"}
         low_res_stream = {"size": (640, 480)}
         video_config = self.picam.create_video_configuration(
             main_stream,
@@ -29,7 +31,27 @@ class PicameraWrapper:
         self.picam.configure(video_config)
 
         encoder = H264Encoder(10000000)
+
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        self.sock.bind(("0.0.0.0", 10001))
+        self.sock.listen()
+
+        self.picam.encoders = encoder
+
+        conn, addr = self.sock.accept()
+        stream = conn.makefile("wb")
+        encoder.output = FileOutput(stream)
+        
         self.picam.start_recording(encoder, 'test.h264')
+
+    def start_socket(self):
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        sock.bind(("0.0.0.0", 10001))
+        sock.listen()
+
+        
         
     def capture_jpeg(self):
         buf = BytesIO()
