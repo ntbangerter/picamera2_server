@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Camera Capture</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+    <script>
+        async function captureImage() {
+	    const response = await fetch('/capture_jpeg');
+	    if (response.ok) {
+		const imageUrl = await response.url + '?t=' + new Date().getTime();
+		document.getElementById('capturedImage').src = imageUrl;
+	    } else {
+		console.error('Failed to capture image');
+	    }
+	}
+    </script>
+</head>
+<body>
+    <h1>Camera Capture</h1>
+    <button onclick="captureImage()">Capture Image</button>
+    <br><br>
+    <img id="capturedImage" alt="Captured Image" />
+</body>
+</html>
