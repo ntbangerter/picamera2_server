@@ -7,7 +7,7 @@ import numpy as np
 class PicameraWrapper:
 
     def __init__(self):
-        self.setup_camera()
+        self.setup_camera_video()
 
     def setup_camera(self):
         self.picam = Picamera2()
@@ -32,9 +32,7 @@ class PicameraWrapper:
         self.picam.start_recording(encoder, 'test.h264')
         
     def capture_jpeg(self):
-        
         buf = BytesIO()
-        # self.picam.capture_file(buf, format="jpeg")
         with self.picam.captured_request() as request:
             request.save("main", buf, format="jpeg")
         buf.seek(0)
@@ -42,7 +40,6 @@ class PicameraWrapper:
 
     def capture_array(self):
         buf = BytesIO()
-        # img_array = self.picam.capture_array()
         with self.picam.captured_request() as request:
             img_array = request.make_array("main")
             np.save(buf, img_array)
