@@ -26,15 +26,15 @@ class PicameraWrapper:
         low_res_stream = {"size": (640, 480)}
         video_config = self.picam.create_video_configuration(
             main_stream,
-            low_res_stream,
-            encode="lores",
+            # low_res_stream,
+            # encode="lores",
             buffer_count=2,
             controls=controls,
         )
         self.picam.configure(video_config)
 
         encoder = H264Encoder(10000000)
-        output = PyavOutput("rtsp://0.0.0.0:8554/cam", format="rtsp")
+        output = PyavOutput("rtsp://0.0.0.0:8554", format="rtsp")
         print("Camera starting")
         self.picam.start_recording(encoder, output)
         time.sleep(90)
