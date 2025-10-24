@@ -2,7 +2,7 @@ from io import BytesIO
 import numpy as np
 from picamera2 import Picamera2
 from picamera2.encoders import H264Encoder
-from picamera2.outputs import FileOutput
+from picamera2.outputs import FileOutput, PyavOutput
 import socket
 
 
@@ -20,23 +20,28 @@ class PicameraWrapper:
         
         full_res = self.picam.sensor_resolution
         # half_res = [dim // 2 for dim in full_res]
-        main_stream = {"size": (1980, 1080), "format": "RGB888"}
+        main_stream = {"size": (1920, 1080), "format": "RGB888"}
+        controls = {'FrameRate': 30}
         low_res_stream = {"size": (640, 480)}
         video_config = self.picam.create_video_configuration(
             main_stream,
             low_res_stream,
             encode="lores",
-            buffer_count=2
+            buffer_count=2,
+            controls=controls,
         )
         self.picam.configure(video_config)
 
         encoder = H264Encoder(10000000)
+        output = PyavOutput("rtsp://0.0.0.0:8554/cam", format="rtsp")
+        print("Camera starting")
+        picam2.start_recording(encoder, output)
 
-        self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.sock.connect(("REMOTEIP", 10001))
-        stream = self.sock.makefile("wb")
+        # self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        # self.sock.connect(("0.0.0.0", 10001))
+        # stream = self.sock.makefile("wb")
         
-        self.picam.start_recording(encoder, FileOutput(stream))
+        # self.picam.start_recording(encoder, FileOutput(stream))
         
     def capture_jpeg(self):
         buf = BytesIO()
