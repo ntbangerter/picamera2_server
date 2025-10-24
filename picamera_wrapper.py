@@ -35,7 +35,7 @@ class PicameraWrapper:
         encoder = H264Encoder(10000000)
         output = PyavOutput("rtsp://0.0.0.0:8554/cam", format="rtsp")
         print("Camera starting")
-        picam2.start_recording(encoder, output)
+        self.picam.start_recording(encoder, output)
 
         # self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         # self.sock.connect(("0.0.0.0", 10001))
