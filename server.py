@@ -34,6 +34,7 @@ def video_feed():
     return Response(
         picam.generate_frames(),
         mimetype='multipart/x-mixed-replace; boundary=frame',
+        direct_passthrough=True,
     )
 
 

@@ -41,17 +41,23 @@ class Picamera:
             MJPEGEncoder(),
             FileOutput(self.output),
             name="lores",
+            quality=80,
         )
 
     def generate_frames(self):
         """Generator that yields MJPEG frames for Flask streaming."""
         while True:
+        with self.output.condition:
+            self.output.condition.wait()
+            frame = self.output.frame
+        # Drain any stale frames
+        while True:
             with self.output.condition:
-                self.output.condition.wait()
+                if self.output.frame == frame:
+                    break
                 frame = self.output.frame
-            if frame:
-                yield (b'--frame\r\n'
-                       b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+        yield (b'--frame\r\n'
+               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
         
     def capture_jpeg(self, high_res=True):
         stream = "main" if high_res else "lores"
