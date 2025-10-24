@@ -81,7 +81,7 @@ class PicameraWrapper:
         while True:
             with self.output.condition:
                 self.output.condition.wait()
-                frame = output.frame
+                frame = self.output.frame
             if frame:
                 yield (b'--frame\r\n'
                        b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
