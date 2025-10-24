@@ -28,6 +28,22 @@ def capture_array():
     )
 
 
+@app.route('/video_feed')
+def video_feed():
+    """Route that returns the MJPEG stream."""
+    return Response(
+        picam.generate_frames(),
+        mimetype='multipart/x-mixed-replace; boundary=frame',
+    )
+
+
 @app.route("/")
 def home():
     return send_file("index.html")
+
+
+if __name__ == "__main__":
+    try:
+        app.run(host='0.0.0.0', port=8000, threaded=True)
+    finally:
+        picam2.stop_recording()

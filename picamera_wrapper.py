@@ -1,10 +1,22 @@
-from io import BytesIO
+from io import BufferedIOBase, BytesIO
 import numpy as np
 from picamera2 import Picamera2
 from picamera2.encoders import H264Encoder
 from picamera2.outputs import FileOutput, PyavOutput
 import time
 import socket
+
+
+
+class StreamingOutput(BufferedIOBase):
+    def __init__(self):
+        self.frame = None
+        self.condition = Condition()
+
+    def write(self, buf):
+        with self.condition:
+            self.frame = buf
+            self.condition.notify_all()
 
 
 class PicameraWrapper:
@@ -17,7 +29,7 @@ class PicameraWrapper:
         self.picam.start()
 
     def setup_camera_video(self):
-        # self.picam = Picamera2()
+        self.picam = Picamera2()
         
         # full_res = self.picam.sensor_resolution
         # # half_res = [dim // 2 for dim in full_res]
@@ -40,23 +52,38 @@ class PicameraWrapper:
         # time.sleep(90)
         # print("Camera ended")
 
-        picam2 = Picamera2()
-        main = {'size': (1920, 1080), 'format': 'YUV420'}
-        controls = {'FrameRate': 30}
-        config = picam2.create_video_configuration(main, controls=controls)
-        picam2.configure(config)
-        encoder = H264Encoder(bitrate=10000000)
-        output = PyavOutput("rtsp://0.0.0.0:8554", format="rtsp")
-        print("Camera starting")
-        picam2.start_recording(encoder, output)
-        time.sleep(90)
-        print("Camera ended")
+        config = self.picam.create_video_configuration(main={"size": (640, 480)})
+        self.picam.configure(config)
+        self.output = StreamingOutput()
+        self.picam.start_recording(MJPEGEncoder(), FileOutput(self.output))
+
+        # picam2 = Picamera2()
+        # main = {'size': (1920, 1080), 'format': 'YUV420'}
+        # controls = {'FrameRate': 30}
+        # config = picam2.create_video_configuration(main, controls=controls)
+        # picam2.configure(config)
+        # encoder = H264Encoder(bitrate=10000000)
+        # output = PyavOutput("rtsp://0.0.0.0:8554", format="rtsp")
+        # print("Camera starting")
+        # picam2.start_recording(encoder, output)
+        # time.sleep(90)
+        # print("Camera ended")
 
         # self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         # self.sock.connect(("0.0.0.0", 10001))
         # stream = self.sock.makefile("wb")
         
         # self.picam.start_recording(encoder, FileOutput(stream))
+
+    def generate_frames(self):
+        """Generator that yields MJPEG frames for Flask streaming."""
+        while True:
+            with self.output.condition:
+                self.output.condition.wait()
+                frame = output.frame
+            if frame:
+                yield (b'--frame\r\n'
+                       b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
         
     def capture_jpeg(self):
         buf = BytesIO()
