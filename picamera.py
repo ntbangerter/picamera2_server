@@ -41,7 +41,6 @@ class Picamera:
             MJPEGEncoder(),
             FileOutput(self.output),
             name="lores",
-            quality=80,
         )
 
     def generate_frames(self):
