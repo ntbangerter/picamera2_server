@@ -5,4 +5,4 @@ Run once when setting up the virtual environment to get access to picamera2:
 `uv venv --system-site-packages`
 
 To run the server:
-`uv run flask run --host=0.0.0.0 --port=8000`
+`uv run server.py`
