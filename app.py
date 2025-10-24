@@ -1,4 +1,4 @@
-from flask import Flask, send_file
+from flask import Flask, Response, send_file
 
 from picamera_wrapper import PicameraWrapper
 
