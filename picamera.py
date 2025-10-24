@@ -22,20 +22,16 @@ class Picamera:
     def __init__(self):
         self.setup_camera_video()
 
-    def setup_camera(self):
-        self.picam = Picamera2()
-        self.picam.start()
-
     def setup_camera_video(self):
         self.picam = Picamera2()
 
-        main_config = {"size": self.picam.sensor_resolution}
+        main_config = {"size": (1920, 1080)}
         low_res_config = {"size": (640, 480)}
 
         config = self.picam.create_video_configuration(
             main=main_config,
             lores=low_res_config,
-            buffer_count=4,
+            buffer_count=2,
             controls={"FrameRate": 30},
         )
         self.picam.configure(config)
@@ -44,7 +40,7 @@ class Picamera:
         self.picam.start_recording(
             MJPEGEncoder(),
             FileOutput(self.output),
-            stream="lores",
+            name="lores",
         )
 
     def generate_frames(self):
