@@ -1,9 +1,9 @@
 from flask import Flask, Response, send_file
 
-from picamera_wrapper import PicameraWrapper
+from picamera import Picamera
 
 
-picam = PicameraWrapper()
+picam = Picamera()
 app = Flask(__name__)
 
 
