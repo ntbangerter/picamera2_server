@@ -1,7 +1,7 @@
 from io import BufferedIOBase, BytesIO
 import numpy as np
 from picamera2 import Picamera2
-from picamera2.encoders import H264Encoder
+from picamera2.encoders import H264Encoder, MJPEGEncoder
 from picamera2.outputs import FileOutput, PyavOutput
 from threading import Condition
 import time
