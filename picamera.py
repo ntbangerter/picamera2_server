@@ -25,9 +25,7 @@ class Picamera:
     def setup_camera_video(self):
         self.picam = Picamera2()
 
-        # main_config = {"size": (1640, 1232)}
-        # temporarily set main config dims to match low for capturing numpy arrays
-        main_config = {"size": (640, 480)}
+        main_config = {"size": (1640, 1232)}
         low_res_config = {"size": (640, 480)}
 
         config = self.picam.create_video_configuration(
