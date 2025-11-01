@@ -1,10 +1,11 @@
-from flask import Flask, Response, send_file
+from flask import Flask, Response, send_file, request
 
 from picamera import Picamera
 
 
 picam = Picamera()
 app = Flask(__name__)
+TRUTHY = ('true', '1', 'yes')
 
 
 @app.route("/health")
@@ -14,16 +15,20 @@ def health():
 
 @app.route("/capture_jpeg")
 def capture_jpeg():
+    # read optional ?high_res= flag (default=true)
+    high_res = request.args.get('high_res', 'true').lower() in TRUTHY
     return send_file(
-        picam.capture_jpeg(),
+        picam.capture_jpeg(high_res=high_res),
         mimetype='image/jpeg'
     )
 
 
 @app.route("/capture_array")
 def capture_array():
+    # read optional ?high_res= flag (default=true)
+    high_res = request.args.get('high_res', 'true').lower() in TRUTHY
     return send_file(
-        picam.capture_array(),
+        picam.capture_array(high_res=high_res),
         mimetype='application/octet-stream',
     )
 
@@ -45,6 +50,10 @@ def home():
 
 if __name__ == "__main__":
     try:
-        app.run(host='0.0.0.0', port=8000, threaded=True)
+        app.run(
+            host='0.0.0.0',
+            port=8000,
+            threaded=True,
+        )
     finally:
-        picam2.stop_recording()
+        picam.stop_recording()
