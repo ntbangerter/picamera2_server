@@ -14,20 +14,17 @@
         }
     </style>
     <script>
-        async function captureImage() {
-	    const response = await fetch('/capture_jpeg');
-	    if (response.ok) {
-		const imageUrl = await response.url + '?t=' + new Date().getTime();
-		document.getElementById('capturedImage').src = imageUrl;
-	    } else {
-		console.error('Failed to capture image');
-	    }
-	}
+        // highRes = true|false, appends timestamp to bust cache
+        function captureImage(highRes) {
+            const url = `/capture_jpeg?high_res=${highRes}&t=${Date.now()}`;
+            document.getElementById('capturedImage').src = url;
+        }
     </script>
 </head>
 <body>
     <h1>Camera Capture</h1>
-    <button onclick="captureImage()">Capture Image</button>
+    <button onclick="captureImage(false)">Capture Low-Res Image</button>
+    <button onclick="captureImage(true)">Capture High-Res Image</button>
     <br><br>
     <img id="capturedImage" alt="Captured Image" width="640" height="480" />
     <br><br>
