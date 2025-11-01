@@ -6,3 +6,6 @@ Run once when setting up the virtual environment to get access to picamera2:
 
 To run the server:
 `uv run server.py`
+
+To run the server in the background:
+`nohup uv run server.py &`
